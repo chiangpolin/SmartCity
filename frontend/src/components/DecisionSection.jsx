@@ -1,16 +1,23 @@
-import { useState } from 'react';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { useState, useEffect } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  CircleMarker,
+  Popup,
+} from 'react-leaflet';
 
-const mockTraffic = ['Light', 'Moderate', 'Heavy'];
-const mockParkingLots = [
-  { name: 'Lot A', lat: 25.033, lng: 121.565, costPerHour: 2 },
-  { name: 'Lot B', lat: 25.037, lng: 121.57, costPerHour: 3 },
-];
+// Utility to round numbers
+function roundTo(num, decimals) {
+  const factor = Math.pow(10, decimals);
+  return Math.round(num * factor) / factor;
+}
 
+const traffics = ['Light', 'Moderate', 'Heavy'];
 const sections = [
   {
-    title: 'Fast & Scalable',
-    text: 'Our platform is built to scale effortlessly with your needs, providing high performance at every stage.',
+    title: 'Algorithmic Decision-Making for Autonomous Urban Mobility',
+    text: 'This study explores an algorithm that enables autonomous vehicles to decide whether to park or keep driving. The decision is based on predicted waiting times, parking availability, traffic conditions, and the cost trade-off between driving and parking, aiming to reduce overall cost and improve city traffic flow.',
     img: '/images/algorithm.png',
     reverse: false,
   },
@@ -36,6 +43,14 @@ const Section = ({ title, text, img, reverse }) => (
   </div>
 );
 
+// Map icon
+const customIcon = new L.Icon({
+  iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30],
+});
+
 const TrafficSelector = ({ traffic, setTraffic }) => {
   const getDelay = (t) =>
     t === 'Heavy' ? '30 mins' : t === 'Moderate' ? '15 mins' : '5 mins';
@@ -48,7 +63,7 @@ const TrafficSelector = ({ traffic, setTraffic }) => {
         onChange={(e) => setTraffic(e.target.value)}
         className='w-full px-4 py-2 border rounded-lg'
       >
-        {mockTraffic.map((t) => (
+        {traffics.map((t) => (
           <option key={t} value={t}>
             {t}
           </option>
@@ -60,6 +75,7 @@ const TrafficSelector = ({ traffic, setTraffic }) => {
 };
 
 const ParkingSelector = ({
+  parkingLots,
   parking,
   setParking,
   parkingTime,
@@ -73,17 +89,16 @@ const ParkingSelector = ({
       <select
         value={parking.name}
         onChange={(e) =>
-          setParking(mockParkingLots.find((p) => p.name === e.target.value))
+          setParking(parkingLots.find((p) => p.name === e.target.value))
         }
         className='w-full px-4 py-2 border rounded-lg'
       >
-        {mockParkingLots.map((p) => (
+        {parkingLots.map((p) => (
           <option key={p.name} value={p.name}>
             {p.name} (${p.costPerHour}/hr)
           </option>
         ))}
       </select>
-
       <label className='block mt-2 font-medium mb-1'>
         Parking Time (hours)
       </label>
@@ -94,7 +109,6 @@ const ParkingSelector = ({
         onChange={(e) => setParkingTime(Number(e.target.value))}
         className='w-full px-4 py-2 border rounded-lg'
       />
-
       <p className='mt-1 text-gray-600'>
         Total Parking Cost: ${totalParkingCost.toFixed(2)}
       </p>
@@ -104,10 +118,32 @@ const ParkingSelector = ({
 
 export default function LeftPanelMap() {
   const [location, setLocation] = useState({ lat: 25.032, lng: 121.565 });
-  const [traffic, setTraffic] = useState(mockTraffic[0]);
-  const [parking, setParking] = useState(mockParkingLots[0]);
+  const [traffic, setTraffic] = useState(traffics[0]);
+  const [parkingLots, setParkingLots] = useState([]);
+  const [parking, setParking] = useState({});
   const [parkingTime, setParkingTime] = useState(1);
   const [decision, setDecision] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/data/parking_algorithm.json');
+        const data = await res.json();
+        const { start_point: s, parking_lots: lots } = data;
+        setLocation({ lat: roundTo(s.y / 100, 3), lng: roundTo(s.x / 100, 3) });
+        const parking_lots = lots.map((lot, i) => ({
+          name: `Lot ${i + 1}`,
+          lat: roundTo(lot.y / 100, 3),
+          lng: roundTo(lot.x / 100, 3),
+          costPerHour: Math.round((Math.random() * (5 - 2) + 2) * 10) / 10,
+        }));
+        setParkingLots(parking_lots);
+        setParking(parking_lots[0]);
+      } catch (err) {
+        console.error('Failed to fetch traffic data', err);
+      }
+    })();
+  }, []);
 
   const electricityCostPerKm = 0.5;
   const distanceToDestination = 5;
@@ -124,7 +160,6 @@ export default function LeftPanelMap() {
           ))}
         </div>
       </section>
-
       <section className='relative w-full h-full overflow-hidden'>
         <MapContainer
           center={[25.032, 121.555]}
@@ -133,15 +168,20 @@ export default function LeftPanelMap() {
           className='absolute inset-0 w-full h-full z-0'
         >
           <TileLayer url='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' />
-          <Marker position={[25.032, 121.565]} />
-          <Marker position={[25.037, 121.57]} />
+          {parkingLots.map((p) => (
+            <Marker position={[p.lat, p.lng]} icon={customIcon}>
+              <Popup>{p.name}</Popup>
+            </Marker>
+          ))}
+          <CircleMarker
+            center={[location.lat, location.lng]}
+            radius={4}
+            color='red'
+          />
         </MapContainer>
-
         <div className='max-w-6xl mx-auto'>
           <div className='relative mt-20 md:w-1/2 bg-white/90 backdrop-blur-sm p-6 rounded-xl z-10 flex flex-col justify-between space-y-4'>
-            <h2 className='text-2xl font-bold mb-4'>
-              Autonomous Driving Panel
-            </h2>
+            <h2 className='text-2xl font-bold mb-4'>Cost Estimator</h2>
 
             <div>
               <label className='block font-medium mb-1'>Current Location</label>
@@ -156,15 +196,14 @@ export default function LeftPanelMap() {
                 className='w-full px-4 py-2 border rounded-lg'
               />
             </div>
-
             <TrafficSelector traffic={traffic} setTraffic={setTraffic} />
-
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
                 <p className='font-medium'>Electricity Cost for Car:</p>
                 <p>${totalElectricityCost.toFixed(2)}</p>
               </div>
               <ParkingSelector
+                parkingLots={parkingLots}
                 parking={parking}
                 setParking={setParking}
                 parkingTime={parkingTime}
@@ -174,27 +213,25 @@ export default function LeftPanelMap() {
 
             <div className='flex gap-4'>
               <button
-                className='flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700'
-                onClick={() => setDecision('Park')}
-              >
-                Park
-              </button>
-              <button
                 className='flex-1 bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300'
                 onClick={() => setDecision('Keep Driving')}
               >
                 Keep Driving
               </button>
+              <button
+                className='flex-1 bg-indigo-700 text-white px-4 py-2 rounded-lg hover:bg-indigo-800'
+                onClick={() => setDecision('Park')}
+              >
+                Park
+              </button>
             </div>
-
             {decision && (
               <div className='mt-4 p-4 bg-gray-50 rounded-lg border'>
                 {decision === 'Park' ? (
                   <p>
                     Route to <strong>{parking.name}</strong> selected. Estimated
-                    cost: $
-                    {(totalElectricityCost + totalParkingCost).toFixed(2)}{' '}
-                    including electricity and parking.
+                    parking cost for {parkingTime} hours: $
+                    {totalParkingCost.toFixed(2)}{' '}
                   </p>
                 ) : (
                   <p>
