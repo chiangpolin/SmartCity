@@ -15,7 +15,7 @@ export default function Hero() {
       <div className='relative z-10 flex h-full items-center pl-12 md:pl-24'>
         <div className='text-white max-w-xl'>
           <h1 className='text-2xl md:text-4xl font-bold mb-6'>
-            Autonomous City
+            Self-Driving City
           </h1>
           <p className='text-lg md:text-xl mb-8'>
             Case Study: Traffic and Parking Challenges in Taipei
