@@ -38,7 +38,7 @@ function generateTrafficData(rawData) {
 
 export default function TrafficSection() {
   return (
-    <section className='w-full py-20 bg-white text-center'>
+    <section className='w-full py-20 bg-white text-center px-8'>
       <h2 className='text-3xl font-bold mb-4'>Weekly Traffic Flow</h2>
       <p className='text-gray-600 mb-8'>
         Average traffic volume per hour over a week, showing peak and off-peak

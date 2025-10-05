@@ -154,14 +154,14 @@ export default function LeftPanelMap() {
 
   return (
     <>
-      <section className='py-20 bg-gray-50'>
+      <section className='py-20 bg-gray-50 px-8'>
         <div className='max-w-6xl mx-auto space-y-24'>
           {sections.map((s, i) => (
             <Section key={i} {...s} />
           ))}
         </div>
       </section>
-      <section className='relative w-full h-full overflow-hidden'>
+      <section className='relative w-full h-full overflow-hidden px-8'>
         <MapContainer
           center={[25.032, 121.555]}
           zoom={15}
@@ -177,11 +177,7 @@ export default function LeftPanelMap() {
           {parkingLots
             .filter((p) => p.name !== parking.name)
             .map((p) => (
-              <CircleMarker
-                center={[p.lat, p.lng]}
-                radius={1}
-                color='red'
-              />
+              <CircleMarker center={[p.lat, p.lng]} radius={1} color='red' />
             ))}
           <CircleMarker
             center={[location.lat, location.lng]}

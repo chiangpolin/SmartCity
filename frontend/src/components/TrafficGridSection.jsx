@@ -77,7 +77,7 @@ export default function ChartGrid() {
   }, []);
 
   return (
-    <section className='w-full py-16 bg-white text-center'>
+    <section className='w-full py-16 bg-white text-center px-8'>
       <h2 className='text-3xl font-bold mb-8'>Traffic Flow By Location</h2>
       <p className='text-gray-600 mb-8'>
         Analysis of Weekday and Weekend Traffic Patterns

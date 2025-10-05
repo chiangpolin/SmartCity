@@ -90,7 +90,7 @@ export default function TrafficDashboardSection() {
   );
 
   return (
-    <section className='w-full py-16 bg-white text-center'>
+    <section className='w-full py-16 bg-white text-center px-8'>
       <h2 className='text-3xl font-bold mb-8'>Daily Traffic Flow</h2>
       <p className='text-gray-600 mb-8'>
         Comparing Observed Traffic Patterns with Regression Model Predictions

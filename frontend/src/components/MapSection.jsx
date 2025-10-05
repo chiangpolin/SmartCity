@@ -112,7 +112,7 @@ export default function MapSection() {
   ];
 
   return (
-    <section className='w-full py-16 bg-black text-center'>
+    <section className='w-full py-16 bg-black text-center px-8'>
       {maps.map((m, idx) => (
         <div key={idx} className='mb-12'>
           <h2 className='text-3xl font-bold mb-4 text-white'>{m.title}</h2>
