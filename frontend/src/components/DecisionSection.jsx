@@ -5,13 +5,8 @@ import {
   Marker,
   CircleMarker,
   Popup,
+  Polyline,
 } from 'react-leaflet';
-
-// Utility to round numbers
-function roundTo(num, decimals) {
-  const factor = Math.pow(10, decimals);
-  return Math.round(num * factor) / factor;
-}
 
 const traffics = ['Light', 'Moderate', 'Heavy'];
 const sections = [
@@ -127,15 +122,15 @@ export default function LeftPanelMap() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/data/parking_algorithm.json');
+        const res = await fetch('/data/parking.json');
         const data = await res.json();
         const { start_point: s, parking_lots: lots } = data;
-        setLocation({ lat: roundTo(s.y / 100, 3), lng: roundTo(s.x / 100, 3) });
-        const parking_lots = lots.map((lot, i) => ({
-          name: `Lot ${i + 1}`,
-          lat: roundTo(lot.y / 100, 3),
-          lng: roundTo(lot.x / 100, 3),
+        setLocation({ lat: s.y, lng: s.x });
+        const parking_lots = lots.map((lot) => ({
+          lat: lot.y,
+          lng: lot.x,
           costPerHour: Math.round((Math.random() * (5 - 2) + 2) * 10) / 10,
+          ...lot,
         }));
         setParkingLots(parking_lots);
         setParking(parking_lots[0]);
@@ -150,6 +145,12 @@ export default function LeftPanelMap() {
 
   const totalElectricityCost = distanceToDestination * electricityCostPerKm;
   const totalParkingCost = parking.costPerHour * parkingTime;
+
+  const coordinates =
+    parking?.polyline?.geoJsonLinestring?.coordinates?.map((i) => [
+      i[1],
+      i[0],
+    ]) || [];
 
   return (
     <>
@@ -168,21 +169,30 @@ export default function LeftPanelMap() {
           className='absolute inset-0 w-full h-full z-0'
         >
           <TileLayer url='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' />
-          {parkingLots.map((p) => (
-            <Marker position={[p.lat, p.lng]} icon={customIcon}>
-              <Popup>{p.name}</Popup>
+          {parking.name && (
+            <Marker position={[parking.y, parking.x]} icon={customIcon}>
+              <Popup>{parking.name}</Popup>
             </Marker>
-          ))}
+          )}
+          {parkingLots
+            .filter((p) => p.name !== parking.name)
+            .map((p) => (
+              <CircleMarker
+                center={[p.lat, p.lng]}
+                radius={1}
+                color='red'
+              />
+            ))}
           <CircleMarker
             center={[location.lat, location.lng]}
             radius={4}
             color='red'
           />
+          <Polyline positions={coordinates} color='red' weight={2} />
         </MapContainer>
         <div className='max-w-6xl mx-auto'>
           <div className='relative mt-20 md:w-1/2 bg-white/90 backdrop-blur-sm p-6 rounded-xl z-10 flex flex-col justify-between space-y-4'>
             <h2 className='text-2xl font-bold mb-4'>Cost Estimator</h2>
-
             <div>
               <label className='block font-medium mb-1'>Current Location</label>
               <input
@@ -194,6 +204,7 @@ export default function LeftPanelMap() {
                 }}
                 placeholder='Enter your current location'
                 className='w-full px-4 py-2 border rounded-lg'
+                disabled
               />
             </div>
             <TrafficSelector traffic={traffic} setTraffic={setTraffic} />

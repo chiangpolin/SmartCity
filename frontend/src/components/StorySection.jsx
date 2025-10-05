@@ -3,13 +3,13 @@ export default function StorySection() {
     {
       title: 'Autonomous Vehicles',
       text: 'Autonomous vehicles in future smart cities face continuous decisions, such as whether to park or continue driving. This research examines strategies to reduce operational costs while improving traffic flow, aiming to identify practical solutions for efficient urban mobility.',
-      img: '/images/car.png',
+      img: '/images/car.jpg',
       reverse: false,
     },
     {
       title: 'Autonomous Buses',
       text: 'In future smart cities, autonomous buses may reshape urban spaces by parking and offering temporary services. However, each decision to drive or park affects operational costs and traffic conditions',
-      img: '/images/bus.png',
+      img: '/images/bus.jpg',
       reverse: true,
     },
   ];

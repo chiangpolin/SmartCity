@@ -58,7 +58,8 @@ export default function MapSection() {
           !id ||
           Number.isNaN(lat) ||
           Number.isNaN(lng) ||
-          Number.isNaN(payex)
+          Number.isNaN(payex) ||
+          Number.isNaN(availablecar)
         )
           return acc;
 
@@ -87,7 +88,7 @@ export default function MapSection() {
     {
       title: 'Parking Lot Locations',
       text: 'Explore the geographical distribution of parking lots across Taipei.',
-      getMarkerProps: (m) => ({
+      getMarkerProps: () => ({
         radius: 1,
         pathOptions: {
           color: 'transparent',
