@@ -1,3 +1,5 @@
+# Smart City
+
 ```
 ├── backend/
 │   ├── src/
@@ -12,6 +14,7 @@
 │       ├── components/                   # React components
 │       └── App.jsx                        # Main React app
 
+```
 ---
 
 ## Backend
