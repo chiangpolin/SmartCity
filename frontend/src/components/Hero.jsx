@@ -3,7 +3,7 @@ export default function Hero() {
     <section className='relative h-screen w-full'>
       {/* Background image */}
       <img
-        src='/images/smart_city.png'
+        src='/images/smart_city.jpg'
         alt='Hero background'
         className='absolute inset-0 w-full h-full object-cover z-0'
       />
