@@ -1,6 +1,6 @@
 # Smart City
 
-Visit the [Website](https://city.chiangpolin.com/)
+Visit the [Website](https://city.chiangpolin.com/) /
 Download [PDF](https://city.chiangpolin.com/pdf/smart_city.pdf)
 
 This project is a **Smart City traffic and parking management system** that integrates real-time traffic prediction, route planning, and parking recommendation.
