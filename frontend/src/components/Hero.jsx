@@ -21,7 +21,7 @@ export default function Hero() {
             Case Study: Traffic and Parking Challenges in Taipei
           </p>
           <a
-            href='https://www.chiangpolin.com/pdf/smart-city.pdf'
+            href='https://city.chiangpolin.com/pdf/smart_city.pdf'
             target='_blank'
             rel='noopener noreferrer'
             className='inline-block px-6 py-3 bg-indigo-700 hover:bg-blue-700 rounded-2xl shadow-lg transition'
